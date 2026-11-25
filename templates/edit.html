@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit event' if event else 'New event' }} · Boiler Bulletin{% endblock %}
+{% block content %}
+<section class="wrap content narrow">
+  <a href="{{ url_for('admin') }}">Back to event desk</a>
+  <h1>{{ 'Edit event' if event else 'New event' }}</h1>
+  {% if event %}<p>{{ "Published" if event.published else "Draft" }} · {{ "Imported" if event.source_key else "Manual" }}</p>{% endif %}
+  {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+  <form class="card stack" method="post">
+    <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+    <label>Title<input name="title" value="{{ values.title or '' }}" maxlength="120" required></label>
+    <label>Date and time (Purdue campus time)<input type="datetime-local" name="starts_at" value="{{ values.starts_at or '' }}" required></label>
+    <label>Location<input name="location" value="{{ values.location or '' }}" maxlength="160" required></label>
+    <label>Category<select name="category" required>
+      <option value="">Choose a category</option>
+      {% for cat in categories %}<option {% if values.category == cat %}selected{% endif %}>{{ cat }}</option>{% endfor %}
+    </select></label>
+    <label>Description<textarea name="description" rows="5" maxlength="3000">{{ values.description or '' }}</textarea></label>
+    <label>Source URL (optional)<input type="url" name="source_url" value="{{ values.source_url or '' }}" maxlength="2048"></label>
+    {% if event and event.source_url %}<a href="{{ event.source_url }}">Open saved source</a>{% endif %}
+    <button>{{ "Save changes" if event else "Save draft" }}</button>
+  </form>
+  {% if event %}
+    <div class="actions">
+      <form method="post" action="{{ url_for('change_event', event_id=event.id, action='unpublish' if event.published else 'publish') }}">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        <button>{{ "Unpublish" if event.published else "Publish saved event" }}</button>
+      </form>
+      <form method="post" data-confirm="Delete this event permanently?" action="{{ url_for('change_event', event_id=event.id, action='delete') }}">
+        <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+        <button class="secondary">Delete event</button>
+      </form>
+    </div>
+    <section class="card stack" aria-labelledby="caption-title">
+      <h2 id="caption-title">Instagram caption</h2>
+      <p>Edit this caption before copying it for Instagram.</p>
+      <label>Caption for saved event<textarea id="caption" rows="7">{{ event.title }}
+{{ event.starts_at | campus_date }} ET
+{{ event.location }}
+
+{{ event.description }}</textarea></label>
+      <button type="button" id="copy-caption" class="secondary" hidden>Copy caption</button>
+      <span role="status" id="copy-status"></span>
+    </section>
+  {% endif %}
+</section>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Event desk · Boiler Bulletin{% endblock %}
+{% block content %}
+<section class="wrap content">
+  <div class="section-title">
+    <h1>Event desk</h1>
+    <a class="button" href="{{ url_for('edit_event') }}">New event</a>
+  </div>
+  {% for status, heading in [(0, "Drafts to review"), (1, "Published events")] %}
+    <h2>{{ heading }}</h2>
+    <div class="queue">
+      {% for event in events if event.published == status %}
+        <article class="card queue-row">
+          <div><h3>{{ event.title }}</h3><p>{{ event.starts_at | campus_date }} ET · {{ event.location }}</p>
+          <p>{{ "Imported" if event.source_key else "Manual" }} · {{ event.category }}</p></div>
+          <a href="{{ url_for('edit_event', event_id=event.id) }}">Review<span class="sr-only"> {{ event.title }}</span></a>
+        </article>
+      {% else %}
+        <p>No {{ "drafts" if status == 0 else "published events" }}.</p>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</section>
+{% endblock %}
