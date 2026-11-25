@@ -27,6 +27,10 @@
   <div class="grid">
     {% for event in events %}
       <article class="card">
+        {% if event.image_url %}
+          <img class="event-image" src="{{ event.image_url }}" alt="{{ event.image_alt }}"
+               loading="lazy" decoding="async" referrerpolicy="no-referrer">
+        {% endif %}
         <p class="category">{{ event.category }}</p>
         <h3>{{ event.title }}</h3>
         <p class="event-time">{{ event.starts_at | campus_date }} ET</p>

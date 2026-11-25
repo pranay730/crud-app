@@ -18,6 +18,11 @@
     <label>Description<textarea name="description" rows="5" maxlength="3000">{{ values.description or '' }}</textarea></label>
     <label>Source URL (optional)<input type="url" name="source_url" value="{{ values.source_url or '' }}" maxlength="2048"></label>
     {% if event and event.source_url %}<a href="{{ event.source_url }}">Open saved source</a>{% endif %}
+    <label>Picture URL (optional)<input type="url" name="image_url" value="{{ values.image_url or '' }}" maxlength="2048"></label>
+    <label>Picture description for screen readers (optional)<input name="image_alt" value="{{ values.image_alt or '' }}" maxlength="250"></label>
+    {% if event and event.image_url %}
+      <img class="event-image" src="{{ event.image_url }}" alt="{{ event.image_alt }}" referrerpolicy="no-referrer">
+    {% endif %}
     <button>{{ "Save changes" if event else "Save draft" }}</button>
   </form>
   {% if event %}

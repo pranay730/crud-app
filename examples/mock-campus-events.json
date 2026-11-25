@@ -1,0 +1,18 @@
+[
+  {
+    "source_key": "mock-facebook:student-art-pop-up-2026-12-05",
+    "title": "[Demo] Student Art Pop-Up",
+    "starts_at": "2026-12-05T14:00",
+    "location": "Purdue Memorial Union, West Lafayette",
+    "category": "Arts",
+    "description": "Fictional event for testing. Browse student-made prints and zines and meet their creators."
+  },
+  {
+    "source_key": "mock-instagram:resume-and-coffee-2026-12-08",
+    "title": "[Demo] Résumé and Coffee Drop-In",
+    "starts_at": "2026-12-08T16:30",
+    "location": "Wilmeth Active Learning Center, West Lafayette",
+    "category": "Career",
+    "description": "Fictional event for testing. Bring a résumé draft for a peer review over coffee."
+  }
+]

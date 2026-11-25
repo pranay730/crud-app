@@ -25,7 +25,7 @@ app.config.update(
 
 CAMPUS_TIME = ZoneInfo("America/Indiana/Indianapolis")
 CATEGORIES = ("Arts", "Career", "Clubs", "Food", "Sports", "Wellness", "Other")
-FIELDS = ("title", "starts_at", "location", "category", "description", "source_url")
+FIELDS = ("title", "starts_at", "location", "category", "description", "source_url", "image_url", "image_alt")
 
 
 def db():
@@ -43,10 +43,20 @@ def db():
                 category TEXT NOT NULL,
                 description TEXT NOT NULL,
                 source_url TEXT NOT NULL,
+                image_url TEXT NOT NULL DEFAULT '',
+                image_alt TEXT NOT NULL DEFAULT '',
                 source_key TEXT UNIQUE,
                 published INTEGER NOT NULL DEFAULT 0 CHECK (published IN (0, 1))
             )
         """)
+        columns = {row["name"] for row in g.db.execute("PRAGMA table_info(events)")}
+        if not {"image_url", "image_alt"} <= columns:
+            with g.db:
+                g.db.execute("BEGIN IMMEDIATE")
+                columns = {row["name"] for row in g.db.execute("PRAGMA table_info(events)")}
+                for column in ("image_url", "image_alt"):
+                    if column not in columns:
+                        g.db.execute(f"ALTER TABLE events ADD COLUMN {column} TEXT NOT NULL DEFAULT ''")
     return g.db
 
 
@@ -64,7 +74,7 @@ def campus_date(value):
 
 def event_values(data):
     values = {}
-    limits = dict(zip(FIELDS, (120, 32, 160, 30, 3000, 2048)))
+    limits = dict(zip(FIELDS, (120, 32, 160, 30, 3000, 2048, 2048, 250)))
     for field in FIELDS:
         value = data.get(field, "")
         if not isinstance(value, str) or len(value.strip()) > limits[field]:
@@ -81,19 +91,21 @@ def event_values(data):
     values["starts_at"] = starts.isoformat(timespec="minutes")
     if values["category"] not in CATEGORIES:
         raise ValueError("Choose a category.")
-    if values["source_url"]:
+    for field, label in (("source_url", "source"), ("image_url", "image")):
+        if not values[field]:
+            continue
         try:
-            source = urlsplit(values["source_url"])
-            if source.scheme not in ("http", "https") or not source.hostname or source.username:
+            source = urlsplit(values[field])
+            if source.scheme not in ("http", "https") or not source.hostname or source.username is not None:
                 raise ValueError
         except ValueError:
-            raise ValueError("Enter a valid HTTP or HTTPS source URL.") from None
+            raise ValueError(f"Enter a valid HTTP or HTTPS {label} URL.") from None
     return values
 
 
 INSERT_EVENT = """
-    INSERT INTO events (title, starts_at, location, category, description, source_url, source_key)
-    VALUES (:title, :starts_at, :location, :category, :description, :source_url, :source_key)
+    INSERT INTO events (title, starts_at, location, category, description, source_url, image_url, image_alt, source_key)
+    VALUES (:title, :starts_at, :location, :category, :description, :source_url, :image_url, :image_alt, :source_key)
 """
 
 
@@ -197,7 +209,8 @@ def edit_event(event_id=None):
             else:
                 connection.execute("""
                     UPDATE events SET title=:title, starts_at=:starts_at, location=:location,
-                        category=:category, description=:description, source_url=:source_url
+                        category=:category, description=:description, source_url=:source_url,
+                        image_url=:image_url, image_alt=:image_alt
                     WHERE id=:id
                 """, dict(values, id=event_id))
         flash("Event saved.")

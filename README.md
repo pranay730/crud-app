@@ -59,3 +59,11 @@ feed omits it, then select **Publish saved event** and search the student feed f
 **Study Break**. The listing uses the same HTML card as manually entered events.
 The event is fictional. If its date has passed, set a future date in the editor
 before publishing. Use **Unpublish** to return the event to the review queue.
+
+For two more fictional drafts, run
+`flask --app app import-events examples/mock-campus-events.json`.
+To try a picture, open a draft and paste a direct image link into **Picture URL**.
+Add a short description for screen readers if the image conveys information.
+Save the event to preview the picture in the editor, then publish it to see the
+image on the student card. Import records can also include optional
+`image_url` and `image_alt` fields.
