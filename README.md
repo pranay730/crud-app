@@ -49,3 +49,13 @@ Use campus-local time and a stable, source-qualified key. Reimporting an existin
 Flask renders Jinja templates and stores events in SQLite. The student feed only queries published events. The password-gated event desk uses signed sessions and checks CSRF tokens for every form submission. Both the HTML form and the importer use the same validation rules. The single-admin setup is intended for local development. A hosted release needs production authentication, HTTPS, and persistent database storage.
 
 Feature branches target `develop`. The release PR targets `main` once the integrated app is ready.
+
+## Try a fictional social event
+
+With the app configured, run `flask --app app import-events examples/mock-social-event.json`.
+The fixture simulates a normalized Instagram result. Open the event desk and find
+**[Demo] Study Break and Board Games** under **Drafts to review**. Verify the public
+feed omits it, then select **Publish saved event** and search the student feed for
+**Study Break**. The listing uses the same HTML card as manually entered events.
+The event is fictional. If its date has passed, set a future date in the editor
+before publishing. Use **Unpublish** to return the event to the review queue.
