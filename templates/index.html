@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Purdue University · West Lafayette</p>
+    <h1>Find your next<br><em>campus plan.</em></h1>
+    <p>Discover what’s happening around Purdue, all in one place.</p>
+  </div>
+</section>
+<section class="wrap content" aria-labelledby="events-title">
+  <div class="section-title">
+    <h2 id="events-title">Campus events</h2>
+    <span>{{ campus_day }}</span>
+  </div>
+  <form class="filters" method="get" action="{{ url_for('index') }}">
+    <label>Search<input type="search" name="q" value="{{ query }}" maxlength="120" placeholder="Events, venues, and more"></label>
+    <label>When<select name="day">
+      <option value="" {% if day != 'today' %}selected{% endif %}>Upcoming</option>
+      <option value="today" {% if day == 'today' %}selected{% endif %}>Today</option>
+    </select></label>
+    <label>Category<select name="category">
+      <option value="">All categories</option>
+      {% for option in categories %}<option {% if category == option %}selected{% endif %}>{{ option }}</option>{% endfor %}
+    </select></label>
+    <button>Find events</button>
+  </form>
+  <div class="grid">
+    {% for event in events %}
+      <article class="card">
+        <p class="category">{{ event.category }}</p>
+        <h3>{{ event.title }}</h3>
+        <p class="event-time">{{ event.starts_at | campus_date }} ET</p>
+        <p>{{ event.location }}</p>
+        {% if event.description %}<p class="description">{{ event.description }}</p>{% endif %}
+        {% if event.source_url %}<a href="{{ event.source_url }}">Original event listing</a>{% endif %}
+      </article>
+    {% else %}
+      <div class="empty">
+        <h3>{% if query or category or day %}No matching events{% else %}No upcoming events yet{% endif %}</h3>
+        {% if query or category or day %}<a href="{{ url_for('index') }}">See all upcoming events</a>{% else %}<p>Check back for the next campus bulletin.</p>{% endif %}
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

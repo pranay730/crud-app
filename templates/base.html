@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Boiler Bulletin{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='site.css') }}">
+  <script defer src="{{ url_for('static', filename='site.js') }}"></script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap nav">
+      <a class="brand" href="{{ url_for('index') }}"><span aria-hidden="true">BB</span> Boiler Bulletin</a>
+      <nav aria-label="Main navigation">
+        <a href="{{ url_for('index') }}">Events</a>
+        <a href="{{ url_for('admin') }}">Admin</a>
+        {% if session.admin %}
+          <form method="post" action="{{ url_for('logout') }}">
+            <input type="hidden" name="csrf" value="{{ csrf_token() }}">
+            <button class="text-button">Sign out</button>
+          </form>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+  <main>
+    {% for message in get_flashed_messages() %}
+      <div class="wrap flash" role="status">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="wrap">Boiler Bulletin · West Lafayette, Indiana</footer>
+</body>
+</html>
